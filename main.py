@@ -231,14 +231,17 @@ buffs_1 = dbc.Col(
          options=[{'label': 'Elixir of the Mongoose', 'value': 'mongoose'},
                   {'label': 'Smoked Desert Dumplings', 'value': 'dumplings'},
                   {'label': 'Grilled Squid', 'value': 'squid'},
-                  {'label': 'Juju Power', 'value': 'juju'},
+                  {'label': 'Juju Power', 'value': 'str_juju'},
+                  {'label': 'Ground Scorpok Assay', 'value': 'scorpok'},
                   {'label': 'Spirit of Zanza', 'value': 'zanza'},
+                  {'label': 'Juju Might', 'value': 'ap_juju'},
                   {'label': 'Winterfall Firewater', 'value': 'firewater'},
                   {'label': 'Consecrated Sharpening Stone', 'value': 'consec'},
                   {'label': 'Major Mana Potion', 'value': 'pot'},
                   {'label': 'Dark / Demonic Rune', 'value': 'rune'}],
          value=[
-             'mongoose', 'squid', 'juju', 'firewater', 'pot', 'rune'
+             'mongoose', 'squid', 'str_juju', 'firewater', 'scorpok', 'pot',
+             'rune'
          ],
          id='consumables'
      ),
@@ -1027,11 +1030,12 @@ def create_buffed_player(
 
     buffed_strength = stat_multiplier * (unbuffed_strength + 1.2 * (
         added_stats + 88.55 * ('str_totem' in raid_buffs)
-        + 30 * ('juju' in consumables) + 20 * ('dumplings' in consumables)
+        + 30 * ('str_juju' in consumables) + 20 * ('dumplings' in consumables)
     ))
     buffed_agi = stat_multiplier * (unbuffed_agi + (
         added_stats + 88.55 * ('agi_totem' in raid_buffs)
         + 25 * ('mongoose' in consumables) + 10 * ('squid' in consumables)
+        + 25 * ('scorpok' in consumables)
     ))
     buffed_int = stat_multiplier * (
         unbuffed_int + 1.2 * (added_stats + 31 * ('ai' in raid_buffs))
@@ -1047,7 +1051,7 @@ def create_buffed_player(
         + 222 * ('might' in raid_buffs) + 290 * ('bshout' in raid_buffs)
         + 100 * ('trueshot_aura' in raid_buffs) + 140 * ('ony' in world_buffs)
         + 200 * ('fengus' in world_buffs) + 100 * ('consec' in consumables)
-        + 35 * ('firewater' in consumables)
+        + max(35*('firewater' in consumables), 40*('ap_juju' in consumables))
     )
     buffed_crit = (
         raw_crit_unbuffed + buffed_agi / 20 + 5 * ('songflower' in world_buffs)
