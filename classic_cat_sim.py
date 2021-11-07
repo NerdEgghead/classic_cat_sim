@@ -142,7 +142,7 @@ def gen_import_link(stat_weights, EP_name='Simmed Weights', multiplier=1.1):
     link += '&0=%.2f' % agi_weight
 
     # Hit Chance
-    link += '&34=&.2f' % stat_weights['1% hit']
+    link += '&34=%.2f' % stat_weights['1% hit']
 
     # Critical Strike Chance
     link += '&40=%.2f' % stat_weights['1% crit']
