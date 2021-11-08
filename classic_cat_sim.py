@@ -174,7 +174,7 @@ class Player():
             bonus_damage=0, shred_bonus=0, multiplier=1.1, omen=True,
             feral_aggression=0, blood_frenzy=2, savage_fury=2,
             natural_shapeshifter=3, weapon_speed=2.0, proc_trinkets=[],
-            log=False
+            t0_bonus=False, log=False
     ):
         """Initialize player with key damage parameters.
 
@@ -212,6 +212,8 @@ class Player():
             proc_trinkets (list of trinkets.ProcTrinket): If applicable, a list
                 of ProcTrinket objects modeling each on-hit or on-crit trinket
                 used by the player.
+            t0_bonus (bool): Whether the 6-piece Shadowcraft set bonus is used.
+                Defaults False.
             log (bool): If True, maintain a log of the most recent event,
                 formatted as a list of strings [event, outcome, energy, combo
                 points]. Defaults False.
@@ -231,6 +233,7 @@ class Player():
         self.jow = jow
         self.pot = pot
         self.rune = rune
+        self.t0_bonus = t0_bonus
         self.bonus_damage = bonus_damage
         self.shred_bonus = shred_bonus
         self.damage_multiplier = multiplier
@@ -357,6 +360,7 @@ class Player():
         self.innervate_cd = 0.0
         self.five_second_rule = False
         self.cat_form = True
+        self.t0_proc = False
 
         # Create dictionary to hold breakdown of total casts and damage
         self.dmg_breakdown = collections.OrderedDict()
@@ -399,6 +403,25 @@ class Player():
         if proc_roll < 0.5:
             self.mana = min(self.mana + 59, self.mana_pool)
 
+    def check_t0_proc(self, yellow=False):
+        """Check for a 6p-Shadowcraft energy proc on a successful melee
+        attack.
+
+        Arguments:
+            yellow (bool): Check proc for a yellow ability rather than a melee
+                swing. Defaults False.
+        """
+        self.t0_proc = False
+
+        if yellow or (not self.t0_bonus):
+            return
+
+        proc_roll = np.random.rand()
+
+        if proc_roll < 1/60.:
+            self.energy = min(self.energy + 35, 100)
+            self.t0_proc = True
+
     def check_procs(self, yellow=False, crit=False):
         """Check all relevant procs that trigger on a successful attack.
 
@@ -410,6 +433,7 @@ class Player():
         """
         self.check_omen_proc(yellow=yellow)
         self.check_jow_proc()
+        self.check_t0_proc(yellow=yellow)
 
         for trinket in self.proc_trinkets:
             trinket.check_for_proc(crit, yellow)
@@ -500,6 +524,12 @@ class Player():
                 damage_str += ' (crit)'
             elif clearcast:
                 damage_str += ' (clearcast)'
+
+            if self.t0_proc:
+                if ')' in damage_str:
+                    damage_str = damage_str[:-1] + ', T0 proc)'
+                else:
+                    damage_str += ' (T0 proc)'
 
         self.combat_log = [
             ability_name, damage_str, '%d' % self.energy,

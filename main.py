@@ -298,7 +298,8 @@ buffs_2 = dbc.Col(
      dbc.Checklist(
          options=[{'label': 'Omen of Clarity', 'value': 'omen'},
                   {'label': 'Darkmoon Faire buff', 'value': 'dmf_buff'},
-                  {'label': 'Bogling Root', 'value': 'bogling_root'}],
+                  {'label': 'Bogling Root', 'value': 'bogling_root'},
+                  {'label': '6-piece Shadowcraft set', 'value': 't0_bonus'}],
          value=['omen'], id='other_buffs',
      )],
     width='auto', style={'marginBottom': '2.5%', 'marginLeft': '2.5%'}
@@ -1079,7 +1080,7 @@ def create_buffed_player(
         blood_frenzy=int(blood_frenzy), weapon_speed=weapon_speed,
         bonus_damage=bonus_weapon_damage, multiplier=damage_multiplier,
         jow='jow' in boss_debuffs, rune='rune' in consumables,
-        pot='pot' in consumables
+        pot='pot' in consumables, t0_bonus='t0_bonus' in other_buffs,
     )
 
     if 'jow' in boss_debuffs:
