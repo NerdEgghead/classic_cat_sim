@@ -463,27 +463,36 @@ class BadgeOfTheSwarmguard(ProcTrinket):
         return 0.0
 
 
-class DarkmoonCardMaelstrom(ProcTrinket):
-    """Custom class to handle instant damage procs from the Darkmoon Card:
+class InstantDamageProc(ProcTrinket):
+    """Custom class to handle instant damage procs such as the Darkmoon Card:
     Maelstrom trinket."""
 
-    def __init__(self, white_chance_on_hit, yellow_chance_on_hit, *args):
-        """Initialize a Trinket object modeling DMC:M. Since this is a ppm
-        trinket, the user must pre-calculate the proc chances based on the
+    def __init__(
+        self, chance_on_hit, yellow_chance_on_hit, min_damage, max_damage,
+        proc_name, *args, **kwargs
+    ):
+        """Initialize Trinket object. Since instant damage procs are ppm
+        trinkets, the user must pre-calculate the proc chances based on the
         swing timer and equipped weapon speed.
 
         Arguments:
-            white_chance_on_hit (float): Probability of a proc on a successful
+            chance_on_hit (float): Probability of a proc on a successful
                 normal hit, between 0 and 1.
             yellow_chance_on_hit (float): Separate proc rate for special
                 abilities.
+            min_damage (float): Minimum damage of the proc, including damage
+                multipliers from Curse of Elements etc.
+            max_damage (float): Maximum damage of the proc, including damage
+                multipliers from Curse of Elements etc.
+            proc_name (str): Name of the proc ability, used for combat logging.
         """
         ProcTrinket.__init__(
-            self, stat_name=None, stat_increment=None,
-            proc_name='Lightning Strike', proc_duration=0,
-            cooldown=0., chance_on_hit=white_chance_on_hit,
+            self, stat_name=None, stat_increment=None, proc_name=proc_name,
+            proc_duration=0, cooldown=0., chance_on_hit=chance_on_hit,
             yellow_chance_on_hit=yellow_chance_on_hit
         )
+        self.min_damage = min_damage
+        self.damage_range = max_damage - min_damage
 
     def activate(self, time, sim):
         """Deal damage when the trinket procs.
@@ -510,9 +519,9 @@ class DarkmoonCardMaelstrom(ProcTrinket):
             return 0.0
 
         # Now roll the base damage done by the proc
-        base_damage = 200 + np.random.rand() * 100
+        base_damage = self.min_damage + np.random.rand() * self.damage_range
 
-        # Now roll for partial resists. Assume that the boss has no nature
+        # Now roll for partial resists. Assume that the boss has no spell
         # resistance, so the only source of partials is the level based
         # resistance of 24 for a boss mob. The partial resist table for this
         # condition was taken from this calculator:
@@ -542,7 +551,7 @@ class DarkmoonCardMaelstrom(ProcTrinket):
         Arguments:
             time (float): Simulation time, in seconds.
             player (tbc_cat_sim.Player): Player object whose attributes can be
-                modified by trinket procs. Unused for RPV calculations, but
+                modified by trinket procs. Unused for calculations, but
                 required by the Trinket API.
             sim (tbc_cat_sim.Simulation): Simulation object controlling the
                 fight execution.
@@ -688,12 +697,27 @@ trinket_library = {
         },
     },
     'maelstrom': {
-        'type': 'proc',
+        'type': 'instant_damage_proc',
         'passive_stats': {},
         'active_stats': {
             'stat_name': 'none',
             'proc_type': 'ppm',
             'proc_rate': 1.,
+            'proc_name': 'Lightning Strike',
+            'min_damage': 200,
+            'max_damage': 300,
+        },
+    },
+    'how': {
+        'type': 'instant_damage_proc',
+        'passive_stats': {},
+        'active_stats': {
+            'stat_name': 'none',
+            'proc_type': 'ppm',
+            'proc_rate': 1.,
+            'proc_name': 'Flame Lash',
+            'min_damage': 120*1.1, # 1.1 multiplier from Curse of Elements
+            'max_damage': 180*1.1,
         },
     },
     'hoj': {

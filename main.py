@@ -546,6 +546,7 @@ iteration_input = dbc.Col([
                 {'label': 'Seal of the Dawn', 'value': 'sotd'},
                 {'label': 'Counterattack Lodestone', 'value': 'lodestone'},
                 {'label': 'Darkmoon Card: Maelstrom', 'value': 'maelstrom'},
+                {'label': 'Heart of Wyrmthalak', 'value': 'how'},
                 {'label': 'Drake Fang Talisman', 'value': 'dft'},
                 {'label': 'Earthstrike', 'value': 'earthstrike'},
                 {'label': 'Badge of the Swarmguard', 'value': 'swarmguard'},
@@ -565,6 +566,7 @@ iteration_input = dbc.Col([
                 {'label': 'Seal of the Dawn', 'value': 'sotd'},
                 {'label': 'Counterattack Lodestone', 'value': 'lodestone'},
                 {'label': 'Darkmoon Card: Maelstrom', 'value': 'maelstrom'},
+                {'label': 'Heart of Wyrmthalak', 'value': 'how'},
                 {'label': 'Drake Fang Talisman', 'value': 'dft'},
                 {'label': 'Earthstrike', 'value': 'earthstrike'},
                 {'label': 'Badge of the Swarmguard', 'value': 'swarmguard'},
@@ -980,15 +982,12 @@ def process_trinkets(trinket_1, trinket_2, player, stat_mod, cd_delay):
                     active_stats['chance_on_hit'],
                     active_stats['yellow_chance_on_hit']
                 )
-            elif trinket == 'maelstrom':
-                trinket_obj = trinkets.DarkmoonCardMaelstrom(
-                    active_stats['chance_on_hit'],
-                    active_stats['yellow_chance_on_hit']
-                )
             elif trinket == 'hoj':
                 trinket_obj = trinkets.HoJ()
             elif trinket_params['type'] == 'refreshing_proc':
                 trinket_obj = trinkets.RefreshingProcTrinket(**active_stats)
+            elif trinket_params['type'] == 'instant_damage_proc':
+                trinket_obj = trinkets.InstantDamageProc(**active_stats)
             else:
                 trinket_obj = trinkets.ProcTrinket(**active_stats)
 
