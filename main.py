@@ -1048,7 +1048,7 @@ def create_buffed_player(
     # Now augment secondary stats
     buffed_attack_power = (
         raw_ap_unbuffed + 2 * buffed_strength + buffed_agi
-        + 222 * ('might' in raid_buffs) + 290 * ('bshout' in raid_buffs)
+        + 186 * ('might' in raid_buffs) + 241 * ('bshout' in raid_buffs)
         + 100 * ('trueshot_aura' in raid_buffs) + 140 * ('ony' in world_buffs)
         + 200 * ('fengus' in world_buffs) + 100 * ('consec' in consumables)
         + max(35*('firewater' in consumables), 40*('ap_juju' in consumables))
