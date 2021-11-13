@@ -452,7 +452,7 @@ iteration_input = dbc.Col([
                     {'label': 'Ferocious Bite', 'value': 'bite'},
                     {'label': 'None', 'value': 'none'},
                 ],
-                value='bite', id='finisher',
+                value='rip', id='finisher',
             ),
         ],
         style={'width': '45%', 'marginBottom': '1.5%'}
@@ -483,7 +483,7 @@ iteration_input = dbc.Col([
                     {'label': '4', 'value': 4},
                     {'label': '5', 'value': 5},
                 ],
-                value=5, id='bite_cp',
+                value=4, id='bite_cp',
             ),
         ],
         style={'width': '60%', 'marginBottom': '1.5%'}
@@ -538,7 +538,7 @@ iteration_input = dbc.Col([
     dbc.Row([
         dbc.Col(dbc.Checklist(
             options=[{'label': " use Ferocious Bite with", 'value': 'bite'}],
-            value=[], id='use_bite',
+            value=['bite'], id='use_bite',
         ), width='auto'),
         dbc.Col('with', width='auto'),
         dbc.Col(dbc.Input(
