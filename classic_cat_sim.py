@@ -171,8 +171,8 @@ class Player():
     def __init__(
             self, attack_power, hit_chance, crit_chance, swing_timer, mana,
             intellect, spirit, mp5, jow=False, pot=True, rune=True,
-            bonus_damage=0, shred_bonus=0, multiplier=1.1, omen=True,
-            feral_aggression=0, blood_frenzy=2, savage_fury=2,
+            bonus_damage=0, shred_bonus=0, bite_rank=4, multiplier=1.1,
+            omen=True, feral_aggression=0, blood_frenzy=2, savage_fury=2,
             natural_shapeshifter=3, weapon_speed=2.0, proc_trinkets=[],
             t0_bonus=False, log=False
     ):
@@ -196,6 +196,9 @@ class Player():
                 Root or Dense Weightstone. Defaults to 0.
             shred_bonus (int): Bonus damage to Shred ability from Idols and set
                 bonuses. Defaults to 0.
+            bite_rank (int): Rank of Ferocious Bite to use. Defaults to Rank 4
+                for Classic Phase 1-5, but Rank 5 can be specified instead for
+                Phase 6.
             multiplier (float): Overall damage multiplier from talents and
                 buffs. Defaults to 1.1 (from 5/5 Natural Weapons).
             omen (bool): Whether Omen of Clarity is active. Defaults True.
@@ -236,6 +239,7 @@ class Player():
         self.t0_bonus = t0_bonus
         self.bonus_damage = bonus_damage
         self.shred_bonus = shred_bonus
+        self.bite_rank = bite_rank
         self.damage_multiplier = multiplier
         self.omen = omen
         self.feral_aggression = feral_aggression
@@ -308,17 +312,26 @@ class Player():
             self.multiplier * (1 + 0.03 * self.feral_aggression)
         )
 
-        # Need to double check that both the scaling coefficients and base
-        # damage values are correct! In TBC, we had to change them, and the
-        # tooltips were incorrect...
-        self.bite_low = {
-            5: (787 + 0.15 * self.attack_power) * self.bite_multiplier,
-            4: (640 + 0.12 * self.attack_power) * self.bite_multiplier
-        }
-        self.bite_high = {
-            5: (847 + 0.15 * self.attack_power) * self.bite_multiplier,
-            4: (700 + 0.12 * self.attack_power) * self.bite_multiplier
-        }
+        # 11/13/21 - Added toggle for both Rank 4 and Rank 5 Bite
+        if self.bite_rank == 4:
+            self.bite_low = {
+                5: (685 + 0.15 * self.attack_power) * self.bite_multiplier,
+                4: (557 + 0.12 * self.attack_power) * self.bite_multiplier
+            }
+            self.bite_high = {
+                5: (735 + 0.15 * self.attack_power) * self.bite_multiplier,
+                4: (607 + 0.12 * self.attack_power) * self.bite_multiplier
+            }
+        else:
+            self.bite_low = {
+                5: (787 + 0.15 * self.attack_power) * self.bite_multiplier,
+                4: (640 + 0.12 * self.attack_power) * self.bite_multiplier
+            }
+            self.bite_high = {
+                5: (847 + 0.15 * self.attack_power) * self.bite_multiplier,
+                4: (700 + 0.12 * self.attack_power) * self.bite_multiplier
+            }
+
         claw_fac = 1 + 0.1 * self.savage_fury
         self.claw_low = claw_fac * (self.white_low + 115 * self.multiplier)
         self.claw_high = claw_fac * (self.white_high + 115 * self.multiplier)

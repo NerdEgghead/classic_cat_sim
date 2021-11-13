@@ -324,6 +324,22 @@ encounter_details = dbc.Col(
          ],
          style={'width': '75%'}
      ),
+     dbc.InputGroup(
+         [
+             dbc.InputGroupAddon(
+                 'Season of Mastery Phase:', addon_type='prepend'
+             ),
+             dbc.Select(
+                 options=[
+                     {'label': '1 - 4', 'value': 1},
+                     {'label': '5', 'value': 5},
+                     {'label': '6', 'value': 6},
+                 ],
+                 value=1, id='som_phase'
+             )
+         ],
+         style={'width': '75%'}
+     ),
      html.Br(),
      html.H5('Boss Debuffs'),
      dbc.Checklist(
@@ -1003,7 +1019,7 @@ def create_buffed_player(
         unbuffed_ap, unbuffed_crit, unbuffed_hit, weapon_damage, weapon_speed,
         unbuffed_mana, unbuffed_mp5, consumables, raid_buffs, world_buffs,
         haste_buffs, num_mcp, other_buffs, boss_debuffs, feral_aggression,
-        blood_frenzy, natural_shapeshifter
+        blood_frenzy, natural_shapeshifter, som_phase
 ):
     """Compute fully raid buffed stats based on specified raid buffs, and
     instantiate a Player object with those stats."""
@@ -1046,9 +1062,12 @@ def create_buffed_player(
     ))
 
     # Now augment secondary stats
+    bshout_ap = 241 if som_phase == 1 else 290
+    might_ap = 186 if som_phase == 1 else 222
     buffed_attack_power = (
         raw_ap_unbuffed + 2 * buffed_strength + buffed_agi
-        + 186 * ('might' in raid_buffs) + 241 * ('bshout' in raid_buffs)
+        + might_ap * ('might' in raid_buffs)
+        + bshout_ap * ('bshout' in raid_buffs)
         + 100 * ('trueshot_aura' in raid_buffs) + 140 * ('ony' in world_buffs)
         + 200 * ('fengus' in world_buffs) + 100 * ('consec' in consumables)
         + max(35*('firewater' in consumables), 40*('ap_juju' in consumables))
@@ -1067,6 +1086,7 @@ def create_buffed_player(
     # Calculate bonus damage parameters
     bonus_weapon_damage = ('bogling_root' in other_buffs) + weapon_damage
     damage_multiplier = 1.1 * (1 + 0.1 * ('dmf_buff' in other_buffs))
+    fb_rank = 5 if som_phase == 6 else 4 
 
     # Create and return a corresponding Player object
     player = ccs.Player(
@@ -1080,6 +1100,7 @@ def create_buffed_player(
         bonus_damage=bonus_weapon_damage, multiplier=damage_multiplier,
         jow='jow' in boss_debuffs, rune='rune' in consumables,
         pot='pot' in consumables, t0_bonus='t0_bonus' in other_buffs,
+        bite_rank=fb_rank
     )
 
     if 'jow' in boss_debuffs:
@@ -1288,6 +1309,7 @@ def plot_new_trajectory(sim, show_whites):
     Input('world_buffs', 'value'),
     Input('haste_buffs', 'value'),
     Input('num_mcp', 'value'),
+    Input('som_phase', 'value'),
     Input('trinket_1', 'value'),
     Input('trinket_2', 'value'),
     Input('run_button', 'n_clicks'),
@@ -1319,13 +1341,13 @@ def plot_new_trajectory(sim, show_whites):
 def compute(
         unbuffed_strength, unbuffed_agi, unbuffed_int, unbuffed_spirit,
         unbuffed_ap, unbuffed_crit, unbuffed_hit, unbuffed_mana, unbuffed_mp5,
-        consumables, raid_buffs, world_buffs, haste_buffs, num_mcp, trinket_1,
-        trinket_2, run_clicks, weight_clicks, graph_clicks, weapon_speed,
-        weapon_damage, other_buffs, feral_aggression, natural_shapeshifter,
-        blood_frenzy, fight_length, boss_armor, boss_debuffs, finisher, rip_cp,
-        bite_cp, max_wait_time, cd_delay, prepop_TF, prepop_numticks,
-        use_claw_trick, use_innervate, use_bite, bite_time, num_replicates,
-        calc_mana_weights, show_whites
+        consumables, raid_buffs, world_buffs, haste_buffs, num_mcp, som_phase,
+        trinket_1, trinket_2, run_clicks, weight_clicks, graph_clicks,
+        weapon_speed, weapon_damage, other_buffs, feral_aggression,
+        natural_shapeshifter, blood_frenzy, fight_length, boss_armor,
+        boss_debuffs, finisher, rip_cp, bite_cp, max_wait_time, cd_delay,
+        prepop_TF, prepop_numticks, use_claw_trick, use_innervate, use_bite,
+        bite_time, num_replicates, calc_mana_weights, show_whites
 ):
     ctx = dash.callback_context
 
@@ -1335,7 +1357,7 @@ def compute(
         unbuffed_ap, unbuffed_crit, unbuffed_hit, weapon_damage, weapon_speed,
         unbuffed_mana, unbuffed_mp5, consumables, raid_buffs, world_buffs,
         haste_buffs, num_mcp, other_buffs, boss_debuffs, feral_aggression,
-        blood_frenzy, natural_shapeshifter
+        blood_frenzy, natural_shapeshifter, int(som_phase)
     )
 
     # Process trinkets
