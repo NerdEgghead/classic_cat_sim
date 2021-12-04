@@ -332,8 +332,7 @@ encounter_details = dbc.Col(
              dbc.Select(
                  options=[
                      {'label': '1 - 4', 'value': 1},
-                     {'label': '5', 'value': 5},
-                     {'label': '6', 'value': 6},
+                     {'label': '5 - 6', 'value': 5},
                  ],
                  value=1, id='som_phase'
              )
@@ -452,7 +451,7 @@ iteration_input = dbc.Col([
                     {'label': 'Ferocious Bite', 'value': 'bite'},
                     {'label': 'None', 'value': 'none'},
                 ],
-                value='rip', id='finisher',
+                value='bite', id='finisher',
             ),
         ],
         style={'width': '45%', 'marginBottom': '1.5%'}
@@ -538,7 +537,7 @@ iteration_input = dbc.Col([
     dbc.Row([
         dbc.Col(dbc.Checklist(
             options=[{'label': " use Ferocious Bite with", 'value': 'bite'}],
-            value=['bite'], id='use_bite',
+            value=[], id='use_bite',
         ), width='auto'),
         dbc.Col('with', width='auto'),
         dbc.Col(dbc.Input(
@@ -595,7 +594,7 @@ iteration_input = dbc.Col([
     ]),
     html.Div(
         'Make sure not to include passive trinket stats in the sim input.',
-        style={'marginTop': '2.5%'},
+        style={'marginTop': '2.5%', 'fontSize': 'large', 'fontWeight': 'bold'},
     ),
     html.Div([
         dbc.Button(
@@ -1086,7 +1085,7 @@ def create_buffed_player(
     # Calculate bonus damage parameters
     bonus_weapon_damage = ('bogling_root' in other_buffs) + weapon_damage
     damage_multiplier = 1.1 * (1 + 0.1 * ('dmf_buff' in other_buffs))
-    fb_rank = 5 if som_phase == 6 else 4 
+    fb_rank = 5
 
     # Create and return a corresponding Player object
     player = ccs.Player(
